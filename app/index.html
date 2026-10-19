@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>sarabyx. Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      body { font-size: 16px; line-height: 1.5; }
+      .list-head h1 { font-size: 42px; line-height: 1.08; }
+      .empty-editor h2, .editor-top h2, .modal-card h2, .setup h2, .settings-panel h2 {
+        font-size: 34px; line-height: 1.1;
+      }
+      .brand-mark { font-size: 26px; }
+      p, .post-item span, .connect-card p, .list-head p, .empty-editor p { font-size: 16px; }
+      .field span, .field-label, .chip, .editor-status, .stage-count { font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">sarabyx.</span>
+          <span class="brand-product">Pipeline</span>
+        </div>
+        <div class="top-actions">
+          <button type="button" class="btn ghost" id="btn-settings">Settings</button>
+          <button type="button" class="btn ghost" id="btn-setup">Connections</button>
+          <button type="button" class="btn ghost" id="btn-ideas">Ideas list</button>
+          <button type="button" class="btn primary" id="btn-new">New post</button>
+        </div>
+      </header>
+
+      <aside class="setup" id="settings-panel" hidden>
+        <div class="setup-inner">
+          <div>
+            <h2>AI model</h2>
+            <p>
+              Works with any OpenAI-compatible API — OpenAI, OpenRouter, Groq, Together, Ollama, or your own URL.
+            </p>
+          </div>
+          <form class="settings-grid" id="settings-form">
+            <label class="field">
+              <span>Provider preset</span>
+              <select id="set-preset" name="aiPreset"></select>
+            </label>
+            <label class="field">
+              <span>Text model</span>
+              <input id="set-model" name="aiModel" placeholder="gpt-4o-mini" />
+            </label>
+            <label class="field">
+              <span>Image model</span>
+              <input id="set-image-model" name="aiImageModel" placeholder="dall-e-3" />
+            </label>
+            <label class="field full">
+              <span>Base URL</span>
+              <input id="set-base" name="aiBaseUrl" placeholder="https://api.openai.com/v1" />
+            </label>
+            <label class="field full">
+              <span>API key</span>
+              <input id="set-key" name="aiApiKey" type="password" placeholder="Paste key — leave blank to keep current" autocomplete="off" />
+            </label>
+            <label class="field full">
+              <span>Brand voice</span>
+              <textarea id="set-voice" name="brandVoice" rows="3"></textarea>
+            </label>
+            <label class="field full">
+              <span>Instagram LLM prompt</span>
+              <textarea id="set-prompt-ig" name="promptInstagram" rows="2" placeholder="How the model should write Instagram posts"></textarea>
+            </label>
+            <label class="field full">
+              <span>LinkedIn LLM prompt</span>
+              <textarea id="set-prompt-li" name="promptLinkedin" rows="2" placeholder="How the model should write LinkedIn posts"></textarea>
+            </label>
+            <label class="field full">
+              <span>Default hashtags</span>
+              <input id="set-tags" name="defaultHashtags" />
+            </label>
+            <p class="settings-hint" id="settings-hint"></p>
+            <div class="modal-actions">
+              <button type="button" class="btn ghost" id="btn-settings-test">Test model</button>
+              <button type="button" class="btn ghost" id="btn-settings-close">Close</button>
+              <button type="submit" class="btn primary">Save settings</button>
+            </div>
+          </form>
+        </div>
+      </aside>
+
+      <aside class="setup" id="setup-panel" hidden>
+        <div class="setup-inner">
+          <div>
+            <h2>Connect for posting</h2>
+            <p>
+              Uses a separate <strong>Pipeline Chrome</strong> window (still Google Chrome).
+              Your everyday Chrome is never quit or changed.
+              1) Enable Chrome control → 2) Open Instagram/LinkedIn there and sign in → 3) Detect sessions → 4) Post.
+            </p>
+          </div>
+          <div class="connect-actions" style="margin-bottom: 12px">
+            <button type="button" class="btn primary" id="btn-chrome-enable">Enable Chrome control</button>
+            <button type="button" class="btn secondary" id="btn-scan">Detect sessions</button>
+            <span class="status-dot" id="status-chrome-control">Checking…</span>
+          </div>
+          <div class="connect-grid">
+            <article class="connect-card">
+              <div class="connect-head">
+                <strong>Instagram</strong>
+                <span class="status-dot" id="status-instagram">Checking…</span>
+              </div>
+              <p>Business or Creator account in Google Chrome.</p>
+              <label class="field full">
+                <span>LLM prompt for Instagram</span>
+                <textarea id="connect-prompt-ig" rows="2" placeholder="e.g. Shorter, punchy hook, keep hashtags"></textarea>
+              </label>
+              <div class="connect-actions">
+                <button type="button" class="btn secondary" data-login="instagram">Open in this browser</button>
+                <button type="button" class="btn ghost" data-confirm="instagram">I’ve signed in</button>
+              </div>
+            </article>
+            <article class="connect-card">
+              <div class="connect-head">
+                <strong>LinkedIn</strong>
+                <span class="status-dot" id="status-linkedin">Checking…</span>
+              </div>
+              <p>Profile or company page in Google Chrome.</p>
+              <label class="field full">
+                <span>LLM prompt for LinkedIn</span>
+                <textarea id="connect-prompt-li" rows="2" placeholder="e.g. Professional, insight-first, few hashtags"></textarea>
+              </label>
+              <div class="connect-actions">
+                <button type="button" class="btn secondary" data-login="linkedin">Open in this browser</button>
+                <button type="button" class="btn ghost" data-confirm="linkedin">I’ve signed in</button>
+              </div>
+            </article>
+            <button type="button" class="btn secondary" id="btn-save-platform-prompts">Save platform prompts</button>
+          </div>
+          <button type="button" class="btn text" id="btn-setup-close">Hide connections</button>
+        </div>
+      </aside>
+
+      <main class="shell">
+        <nav class="stages" aria-label="Pipeline stages">
+          <button type="button" class="stage is-active" data-stage="all">
+            <span class="stage-label">All</span>
+            <span class="stage-count" data-count="all">0</span>
+          </button>
+          <button type="button" class="stage" data-stage="ideas">
+            <span class="stage-label">Ideas</span>
+            <span class="stage-count" data-count="ideas">0</span>
+          </button>
+          <button type="button" class="stage" data-stage="review">
+            <span class="stage-label">Needs you</span>
+            <span class="stage-count" data-count="review">0</span>
+          </button>
+          <button type="button" class="stage" data-stage="queue">
+            <span class="stage-label">Ready to post</span>
+            <span class="stage-count" data-count="queue">0</span>
+          </button>
+          <button type="button" class="stage" data-stage="done">
+            <span class="stage-label">Posted</span>
+            <span class="stage-count" data-count="done">0</span>
+          </button>
+        </nav>
+
+        <section class="list-pane" aria-label="Posts">
+          <div class="list-head">
+            <h1 id="list-title">All posts</h1>
+            <p id="list-sub">Write once. Approve. Post to Instagram and LinkedIn.</p>
+            <div class="list-tools">
+              <button type="button" class="btn secondary" id="btn-generate-all">Generate drafts for ideas</button>
+              <button type="button" class="btn primary" id="btn-post-queue" hidden>Post all approved</button>
+            </div>
+          </div>
+          <div id="post-list" class="post-list"></div>
+        </section>
+
+        <section class="editor-pane" aria-label="Editor">
+          <div class="empty-editor" id="empty-editor">
+            <h2>Pick a post, or start a new one.</h2>
+            <p>
+              Add ideas, generate drafts with your model, approve or send comments to regenerate.
+              Nothing goes live until you post.
+            </p>
+            <button type="button" class="btn primary" id="btn-new-empty">New post</button>
+          </div>
+
+          <form class="editor" id="editor" hidden>
+            <div class="editor-top">
+              <div>
+                <p class="editor-status" id="editor-status">Draft</p>
+                <h2 id="editor-title">Untitled idea</h2>
+              </div>
+              <div class="editor-top-actions">
+                <button type="button" class="btn danger-ghost" id="btn-delete">Delete</button>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>Idea</span>
+                <input id="field-idea" placeholder="e.g. AEO tips" required />
+              </label>
+              <label class="field">
+                <span>Post date</span>
+                <input id="field-date" type="date" />
+              </label>
+              <label class="field full">
+                <span>Angle</span>
+                <input id="field-angle" placeholder="The point of view — one sentence" required />
+              </label>
+            </div>
+
+            <div class="platforms">
+              <span class="field-label">Post to</span>
+              <label class="check"><input type="checkbox" id="plat-instagram" checked /><span>Instagram</span></label>
+              <label class="check"><input type="checkbox" id="plat-linkedin" checked /><span>LinkedIn</span></label>
+            </div>
+
+            <div class="platform-prompts">
+              <label class="field full">
+                <span>Instagram LLM prompt (this post)</span>
+                <textarea id="field-prompt-ig" rows="2" placeholder="Optional — overrides Settings for Instagram on this post"></textarea>
+              </label>
+              <label class="field full">
+                <span>LinkedIn LLM prompt (this post)</span>
+                <textarea id="field-prompt-li" rows="2" placeholder="Optional — overrides Settings for LinkedIn on this post"></textarea>
+              </label>
+            </div>
+
+            <label class="drop" id="dropzone">
+              <input type="file" id="field-image" accept="image/png,image/jpeg,image/webp" hidden />
+              <div id="drop-copy">
+                <strong>Add image</strong>
+                <span>Required for Instagram · PNG or JPG</span>
+              </div>
+              <div id="image-preview" hidden></div>
+            </label>
+
+            <label class="field full">
+              <span>Caption</span>
+              <textarea id="field-caption" rows="8" placeholder="Generate a draft, then edit in your voice."></textarea>
+            </label>
+
+            <label class="field full">
+              <span>Hashtags</span>
+              <input id="field-hashtags" placeholder="#buildinpublic #automation" />
+            </label>
+
+            <div class="feedback-box">
+              <label class="field full">
+                <span>Not good? Tell the model what to change</span>
+                <textarea id="field-feedback" rows="3" placeholder="e.g. Shorter. Less salesy. — or: Generate an image of a clean desk with a laptop"></textarea>
+              </label>
+              <button type="button" class="btn secondary" id="btn-regenerate">Regenerate with comments</button>
+            </div>
+
+            <p class="editor-note" id="editor-note" hidden></p>
+            <p class="editor-error" id="editor-error" hidden></p>
+
+            <div class="editor-actions">
+              <button type="button" class="btn secondary" id="btn-save">Save</button>
+              <button type="button" class="btn secondary" id="btn-draft">Generate draft</button>
+              <button type="button" class="btn ghost" id="btn-approve">Approve</button>
+              <button type="button" class="btn primary" id="btn-post" disabled title="Approve first">Post now</button>
+              <button type="button" class="btn secondary" id="btn-mark-posted" hidden>Mark as posted</button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="modal" id="new-modal">
+      <form method="dialog" class="modal-card" id="new-form">
+        <header>
+          <h2>New post</h2>
+          <p>Idea + angle is enough to start.</p>
+        </header>
+        <label class="field"><span>Idea</span><input name="idea" required placeholder="What is this about?" /></label>
+        <label class="field"><span>Angle</span><input name="angle" required placeholder="The take you’ll share" /></label>
+        <label class="field"><span>Post date</span><input name="scheduled_date" type="date" /></label>
+        <div class="platforms">
+          <span class="field-label">Post to</span>
+          <label class="check"><input type="checkbox" name="instagram" checked /><span>Instagram</span></label>
+          <label class="check"><input type="checkbox" name="linkedin" checked /><span>LinkedIn</span></label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="btn-new-cancel">Cancel</button>
+          <button type="submit" class="btn primary">Create & draft</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="ideas-modal">
+      <form method="dialog" class="modal-card" id="ideas-form">
+        <header>
+          <h2>Ideas list</h2>
+          <p>One idea per line. Optional angle after a pipe: <code>Idea | Angle</code></p>
+        </header>
+        <label class="field">
+          <span>Ideas</span>
+          <textarea name="text" rows="10" required placeholder="AEO tips | Customers ask AI first&#10;n8n demo | Write once, post everywhere"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="btn-ideas-cancel">Cancel</button>
+          <button type="submit" class="btn primary">Add ideas</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" hidden></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

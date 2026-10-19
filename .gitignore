@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+browser/node_modules/
+
+# Secrets & local runtime (never ship)
+.env
+data/settings.json
+data/connections.json
+data/chrome-control.json
+data/chrome-profile/
+data/n8n/
+sheet/content.csv
+sheet/content.local.csv
+sheet/.lock
+
+# Browser profiles / session data
+browser/profiles/
+**/Singleton*
+**/Current Session
+**/Current Tabs
+
+# User media uploads (keep folder + README)
+browser/media/*
+!browser/media/.gitkeep
+!browser/media/README.md
+
+# OS / editor
+.DS_Store
+*.log
+.impeccable/
+
+# Local release artifacts
+dist/
+*.zip
+
+# Optional reference assets (large; not required to run)
+references/
+
+# Keep docs/screenshots + docs/marketing in git for README

@@ -1,0 +1,16 @@
+{
+  "name": "sarabyx-social-poster",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Pipeline app — posts via the customer's Google Chrome (no Playwright)",
+  "scripts": {
+    "setup": "npm install",
+    "poster": "node poster-server.mjs",
+    "draft": "node draft.mjs"
+  },
+  "dependencies": {
+    "csv-parse": "^5.6.0",
+    "csv-stringify": "^6.5.2"
+  }
+}

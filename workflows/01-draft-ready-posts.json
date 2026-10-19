@@ -1,0 +1,227 @@
+{
+  "name": "01 · Draft Ready Posts",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1111111-1111-1111-1111-111111111111",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "a2222222-2222-2222-2222-222222222222",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 500]
+    },
+    {
+      "parameters": {
+        "url": "={{ ($env.POSTER_BASE_URL || 'http://host.docker.internal:3920') + '/ready' }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "a3333333-3333-3333-3333-333333333333",
+      "name": "Get Ready Rows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items[0].json.rows || [];\nif (!rows.length) {\n  return [{ json: { empty: true, message: 'No Ready rows' } }];\n}\nreturn rows.map((row) => ({ json: row }));"
+      },
+      "id": "a4444444-4444-4444-4444-444444444444",
+      "name": "Split Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.empty }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notTrue"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a5555555-5555-5555-5555-555555555555",
+      "name": "Has Rows?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [980, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.POSTER_BASE_URL || 'http://host.docker.internal:3920') + '/draft' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"id\": \"{{ $json.id }}\"\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "a6666666-6666-6666-6666-666666666666",
+      "name": "Draft with AI / Template",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1220, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "next_step",
+              "value": "Open http://127.0.0.1:3920/approvals to approve",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a7777777-7777-7777-7777-777777777777",
+      "name": "Point to Approvals UI",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1460, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s2",
+              "name": "message",
+              "value": "No Ready rows right now",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a8888888-8888-8888-8888-888888888888",
+      "name": "Nothing to Draft",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1220, 520]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Ready Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Get Ready Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ready Rows": {
+      "main": [
+        [
+          {
+            "node": "Split Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Rows": {
+      "main": [
+        [
+          {
+            "node": "Has Rows?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Rows?": {
+      "main": [
+        [
+          {
+            "node": "Draft with AI / Template",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nothing to Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft with AI / Template": {
+      "main": [
+        [
+          {
+            "node": "Point to Approvals UI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "name": "sarabyx"
+    }
+  ]
+}

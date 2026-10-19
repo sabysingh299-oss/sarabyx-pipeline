@@ -1,0 +1,13 @@
+{
+  "name": "sarabyx-n8n-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local n8n open-source social pipeline for Instagram + LinkedIn (browser automation)",
+  "scripts": {
+    "setup": "./scripts/setup.sh",
+    "start": "./scripts/start-ui.sh",
+    "start:ui": "./scripts/start-ui.sh",
+    "start:n8n": "./scripts/start.sh",
+    "pack": "./scripts/pack-release.sh"
+  }
+}
