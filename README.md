@@ -45,8 +45,8 @@ Enable Chrome control, sign into Instagram & LinkedIn once, then Detect sessions
 ## Quick start
 
 ```bash
-git clone https://github.com/OWNER/REPO.git
-cd REPO
+git clone https://github.com/sabysingh299-oss/sarabyx-pipeline.git
+cd sarabyx-pipeline
 ./scripts/setup.sh
 ./scripts/start-ui.sh
 ```
